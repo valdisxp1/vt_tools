@@ -1,0 +1,2 @@
+sbt.bat console
+pause
