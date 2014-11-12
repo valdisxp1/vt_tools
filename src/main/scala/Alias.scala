@@ -5,11 +5,14 @@ import org.apache.commons.math3.distribution._
   def F(t: Double) = normalDistribution.cumulativeProbability(t)
   def Phi(t: Double) = normalDistribution.cumulativeProbability(-t,t)
 
-//TODO FIX
-  def Chi(degreesOfFreedom: Int, probability: Double) = new ChiSquaredDistribution(degreesOfFreedom).inverseCumulativeProbability(probability)
+  def Chi(degreesOfFreedom: Int, probability: Double) = {
+    val adjustedAlpha = (1 - probability)
+    new ChiSquaredDistribution(degreesOfFreedom).inverseCumulativeProbability(adjustedAlpha)
+  }
 
   def U_t_ni(t: Double, degreesOfFreedom: Int) = new TDistribution(degreesOfFreedom).cumulativeProbability(-t,t)
-  def U_alpha_ni(probability: Double, degreesOfFreedom: Int) ={
+  def U_alpha_ni(probability: Double, degreesOfFreedom: Int) = {
+    //divpuseja robeza
     val adjustedAlpha = (1 - probability) / 2
     val result = new TDistribution(degreesOfFreedom).inverseCumulativeProbability(adjustedAlpha)
     -result
