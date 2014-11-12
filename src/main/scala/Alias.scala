@@ -9,10 +9,12 @@ import org.apache.commons.math3.distribution._
   def Chi(degreesOfFreedom: Int, probability: Double) = new ChiSquaredDistribution(degreesOfFreedom).inverseCumulativeProbability(probability)
 
   def U_t_ni(t: Double, degreesOfFreedom: Int) = new TDistribution(degreesOfFreedom).cumulativeProbability(-t,t)
-//TODO FIX
-  def U_alpha_ni(probability: Double, degreesOfFreedom: Int) = new TDistribution(degreesOfFreedom).inverseCumulativeProbability(probability)
+  def U_alpha_ni(probability: Double, degreesOfFreedom: Int) ={
+    val adjustedAlpha = (1 - probability) / 2
+    val result = new TDistribution(degreesOfFreedom).inverseCumulativeProbability(adjustedAlpha)
+    -result
+  }
 
   def Stjudent_t_ni(t: Double, degreesOfFreedom: Int) = U_t_ni(t, degreesOfFreedom)
-//TODO FIX  
-def Stjudent_alpha_ni(probability: Double, degreesOfFreedom: Int) = U_alpha_ni(probability, degreesOfFreedom)
+  def Stjudent_alpha_ni(probability: Double, degreesOfFreedom: Int) = U_alpha_ni(probability, degreesOfFreedom)
 }
