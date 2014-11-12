@@ -8,4 +8,4 @@ libraryDependencies += "org.jfree" % "jfreechart" % "1.0.14"
 
 libraryDependencies += "org.apache.commons" % "commons-math3" % "3.0"
 
-
+initialCommands in console := "import Alias._"
