@@ -96,13 +96,19 @@ sealed trait Generator {
      val footer = "\\end{tabular}"
      val corner = s"\\backslashbox{$intParameterName}{$doubleParameterName}"
      val doubleFormat = NumberFormat.getInstance
-     doubleFormat.setMaximumFractionDigits(3)
+     doubleFormat.setMaximumFractionDigits(4)
      val topScale = (corner +: doubleRange.map(doubleFormat.format _)).mkString("&")
+     val fullTable = intRange.map{i=>
+	i.toString +: doubleRange.map{d=>"%1.4f".format(f(i,d))}.map("$"+_+"$")
+     }
+     val segments = fullTable.grouped(5)
+     val middle = segments.map(_.map(_.mkString("&")).mkString(newRow)).mkString(newRow+newRow)
      (
       header+
       hline+
       topScale+newRow+
       hline+
+      middle+newRow+
       footer
      )
   }
@@ -169,7 +175,23 @@ object ChiSquaredDistTable extends Generator {
                         doubleParameterName="Q",
                         f=Chi _,
                         intRange=(1 to 40),
-                        doubleRange=Seq(0.995,0.999,0.95,0.99,0.975,0.95,0.90))
+                        doubleRange=Seq(0.9995,0.999,0.995,0.99,0.975,0.95,0.90))+"\n\n"+
+               "\\noindent\n"+
+               intAndDoubleTable(
+                        intParameterName ="n",
+                        doubleParameterName="Q",
+                        f=Chi _,
+                        intRange=(1 to 40),
+                        doubleRange=Seq(0.8,0.7,0.6,0.5,0.4,0.3,0.2))+"\n\n"+
+
+               "\\noindent\n"+
+               intAndDoubleTable(
+                        intParameterName ="n",
+                        doubleParameterName="Q",
+                        f=Chi _,
+                        intRange=(1 to 40),
+                        doubleRange=Seq(0.1,0.05,0.025,0.01,0.005,0.001,0.0005))
+
                )
   val header = "Hī kvadrāta sadalījums"
 }
