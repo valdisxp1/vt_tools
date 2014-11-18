@@ -1,5 +1,7 @@
 object Generate extends App {
-  val generators = Seq(NormDistTable,SimNormDistTable)
+  val generators = Seq(NormDistTable,
+                       SimNormDistTable,
+                       ChiSquaredDistTable)
   generators.foreach(_.toFile())
 }
 
@@ -14,6 +16,7 @@ sealed trait Generator {
   Seq("\\documentclass[12pt]{article}",
   "\\usepackage{polyglossia}",
   "\\usepackage{fullpage}",
+  "\\usepackage{slashbox}",
   "\\usepackage{mathtools}",
   "\\begin{document}").mkString("\n")
   val end = "\\end{document}"
@@ -81,6 +84,28 @@ sealed trait Generator {
      footer
     )
   }
+
+  def intAndDoubleTable(
+                        intParameterName: String,
+                        doubleParameterName: String,
+                        f: (Int,Double)=>Double,
+                        intRange: Seq[Int],
+                        doubleRange: Seq[Double]) = {
+     import java.text.NumberFormat
+     val header = "\\begin{tabular}{r |"+(" c" * doubleRange.size)+"}"
+     val footer = "\\end{tabular}"
+     val corner = s"\\backslashbox{$intParameterName}{$doubleParameterName}"
+     val doubleFormat = NumberFormat.getInstance
+     doubleFormat.setMaximumFractionDigits(3)
+     val topScale = (corner +: doubleRange.map(doubleFormat.format _)).mkString("&")
+     (
+      header+
+      hline+
+      topScale+newRow+
+      hline+
+      footer
+     )
+  }
 }
 
 object NormDistTable extends Generator {
@@ -131,4 +156,20 @@ object SimNormDistTable extends Generator {
     |(laukuma daļa zem līknes no $-t$ līdz $+t$)\\
     |$\displaystyle \Phi(t)={1\over\sqrt{2\pi}}\int\limits_{-t}^{+t}e^{-t^2\over2}dt$
   """.stripMargin
+}
+
+object ChiSquaredDistTable extends Generator {
+  import Alias.Chi
+  val defaultFileName = "chiSquaredDist.tex"
+  def inner = (
+               header+"\n\n"+
+               "\\noindent\n"+
+               intAndDoubleTable(
+                        intParameterName ="n",
+                        doubleParameterName="Q",
+                        f=Chi _,
+                        intRange=(1 to 40),
+                        doubleRange=Seq(0.995,0.999,0.95,0.99,0.975,0.95,0.90))
+               )
+  val header = "Hī kvadrāta sadalījums"
 }
