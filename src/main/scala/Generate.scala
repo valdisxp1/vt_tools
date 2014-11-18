@@ -65,7 +65,6 @@ sealed trait Generator {
       (x,y)=>
         val arg = i+direction*(y*0.1+x*0.01)
         formatValue(f(arg))
-	arg
       }
       val fullTable = (leftScale zip table).map{case(item,seq)=>i +: seq}
       fullTable.map(_.mkString("&")).mkString(newRow)
@@ -96,7 +95,11 @@ object NormDistTable extends Generator {
               "\\noindent\n"+
               oneHundrethTable(parameterName="t",
                                f=F _,
-                               range=(1 to 3))+"\n\n\\*\n\n"+
+                               range=(0 to -2 by -1))+"\n\n\\*\n\n"+
+              "\\noindent\n"+
+              oneHundrethTable(parameterName="t",
+                               f=F _,
+                               range=(0 to 2))+"\n\n\\*\n\n"+
                               
               "\\noindent\n"+
               hTable(parameterName="t",
