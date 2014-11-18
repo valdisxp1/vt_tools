@@ -28,6 +28,7 @@ sealed trait Generator {
 
   private val hline ="\\hline\n"
   private val newRow = "\\\\\n"
+  private def formatValue(d: Double) = if(d < 0.99995) ("%1.4f".format(d)).drop(2) else "%1.4f".format(d)
 
   def hTable(parameterName: String,
              functionName: String,
@@ -36,7 +37,6 @@ sealed trait Generator {
     val header = "\\begin{tabular}{r"+(" c" * range.size)+"}"
     val argFormat = "%1.1f"
     val args = range.map(argFormat.format(_)).map("$"+_+"$").mkString("&")
-    def formatValue(d: Double) = if(d < 0.99995) ("%1.4f".format(d)).drop(2) else "%1.4f".format(d)
     val values = "$."+range.map(f).map(formatValue _).map("$"+_+"$").mkString("&").drop(1)
     val footer = "\\end{tabular}"
     (
@@ -56,11 +56,27 @@ sealed trait Generator {
     val header = "\\begin{tabular}{r"+(" c" * 10)+"}"
     val footer = "\\end{tabular}"
     val topScale = parameterName + "& $."+ (0 to 9).map("$0"+_+"$").mkString("&").drop(1)
+    val direction = if((range.last-range.head) < 0) -1 else 1
+    def segment(i:Int)={
+      val minusOfZero = if(i==0 && direction<0) "-" else "" 
+      val corner = minusOfZero + i + ".0"
+      val leftScale = corner +: ((1 to 9).map(_.toString))
+      val table = Seq.tabulate(10,10){
+      (x,y)=>
+        val arg = i+direction*(y*0.1+x*0.01)
+        formatValue(f(arg))
+	arg
+      }
+      val fullTable = (leftScale zip table).map{case(item,seq)=>i +: seq}
+      fullTable.map(_.mkString("&")).mkString(newRow)
+    }
+     val middle =range.map(segment _).mkString(newRow+newRow)
     (
      header+
      hline+
      topScale+newRow+
      hline+
+     middle+newRow+
      footer
     )
   }
