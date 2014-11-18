@@ -26,6 +26,9 @@ sealed trait Generator {
     pw.close
   }
 
+  private val hline ="\\hline\n"
+  private val newRow = "\\\\\n"
+
   def hTable(parameterName: String,
              functionName: String,
              f: Double=>Double,
@@ -35,14 +38,28 @@ sealed trait Generator {
     val args = range.map(argFormat.format(_)).map("$"+_+"$").mkString("&")
     def formatValue(d: Double) = if(d < 0.99995) ("%1.4f".format(d)).drop(2) else "%1.4f".format(d)
     val values = "$."+range.map(f).map(formatValue _).map("$"+_+"$").mkString("&").drop(1)
-    val hline ="\\hline\n" 
     val footer = "\\end{tabular}"
     (
      header+"\n"+
      hline+
-     parameterName+"&"+args+"\\\\\n"+
+     parameterName+"&"+args+newRow+
      hline+
-     functionName+"&"+values+"\\\\\n"+
+     functionName+"&"+values+newRow+
+     hline+
+     footer
+    )
+  }
+
+  def oneHundrethTable(parameterName: String,
+                       f: Double=>Double,
+                       range: Seq[Int]) = {
+    val header = "\\begin{tabular}{r"+(" c" * 10)+"}"
+    val footer = "\\end{tabular}"
+    val topScale = parameterName + "& $."+ (0 to 9).map("$0"+_+"$").mkString("&").drop(1)
+    (
+     header+
+     hline+
+     topScale+newRow+
      hline+
      footer
     )
@@ -59,13 +76,18 @@ object NormDistTable extends Generator {
                       functionName="F(t)",
                       f=F _,
                       //-3.0 līdz -3.9
-                      range=(-3.0 until -4.0 by -0.1))+"\n\n"+
+                      range=(-3.0 until -4.0 by -0.1))+"\n\n\\*\n\n"+
+              "\\noindent\n"+
+              oneHundrethTable(parameterName="t",
+                               f=F _,
+                               range=(1 to 3))+"\n\n\\*\n\n"+
+                              
               "\\noindent\n"+
               hTable(parameterName="t",
-                      functionName="F(t)",
-                      f=F _,
-                      //3.0 līdz 3.9
-                      range=(3.0 until 4.0 by 0.1))
+                     functionName="F(t)",
+                     f=F _,
+                     //3.0 līdz 3.9
+                     range=(3.0 until 4.0 by 0.1))
               )
   val header = """
     |Normālā integrāļa funkcija 
