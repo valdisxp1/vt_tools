@@ -66,7 +66,7 @@ sealed trait Generator {
         val arg = i+direction*(y*0.1+x*0.01)
         formatValue(f(arg))
       }
-      val fullTable = (leftScale zip table).map{case(item,seq)=>i +: seq}
+      val fullTable = (leftScale zip table).map{case(item,seq)=>item +: seq}
       fullTable.map(_.mkString("&")).mkString(newRow)
     }
      val middle =range.map(segment _).mkString(newRow+newRow)
