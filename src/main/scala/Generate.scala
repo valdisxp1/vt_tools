@@ -12,6 +12,7 @@ sealed trait Generator {
   val begin = 
   Seq("\\documentclass[12pt]{article}",
   "\\usepackage{polyglossia}",
+  "\\usepackage{fullpage}",
   "\\usepackage{mathtools}",
   "\\begin{document}").mkString("\n")
   val end = "\\end{document}"
@@ -28,7 +29,7 @@ sealed trait Generator {
 
   private val hline ="\\hline\n"
   private val newRow = "\\\\\n"
-  private def formatValue(d: Double) = if(d < 0.99995) ("%1.4f".format(d)).drop(2) else "%1.4f".format(d)
+  private def formatValue(d: Double) = if(d < 0.999995) ("%1.5f".format(d)).drop(2) else "%1.5f".format(d)
 
   def hTable(parameterName: String,
              functionName: String,
