@@ -1,5 +1,6 @@
 object Generate extends App {
-  NormDistTable.toFile()
+  val generators = Seq(NormDistTable)
+  generators.foreach(_.toFile())
 }
 
 object GenerateAll extends Generator{
@@ -65,9 +66,9 @@ sealed trait Generator {
       val table = Seq.tabulate(10,10){
       (x,y)=>
         val arg = i+direction*(y*0.1+x*0.01)
-        formatValue(f(arg))
+        "$"+formatValue(f(arg))+"$"
       }
-      val fullTable = (leftScale zip table).map{case(item,seq)=>item +: seq}
+      val fullTable = (leftScale zip table).map{case(item,seq)=>item +:("$."+seq.head.drop(1)) +: seq.tail}
       fullTable.map(_.mkString("&")).mkString(newRow)
     }
      val middle =range.map(segment _).mkString(newRow+newRow)
