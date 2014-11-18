@@ -1,5 +1,5 @@
 object Generate extends App {
-  val generators = Seq(NormDistTable)
+  val generators = Seq(NormDistTable,SimNormDistTable)
   generators.foreach(_.toFile())
 }
 
@@ -94,25 +94,41 @@ object NormDistTable extends Generator {
                       f=F _,
                       //-3.0 līdz -3.9
                       range=(-3.0 until -4.0 by -0.1))+"\n\n\\*\n\n"+
-              "\\noindent\n"+
-              oneHundrethTable(parameterName="t",
+               "\\noindent\n"+
+               oneHundrethTable(parameterName="t",
                                f=F _,
                                range=(0 to -2 by -1))+"\n\n\\*\n\n"+
-              "\\noindent\n"+
-              oneHundrethTable(parameterName="t",
-                               f=F _,
-                               range=(0 to 2))+"\n\n\\*\n\n"+
-                              
-              "\\noindent\n"+
-              hTable(parameterName="t",
-                     functionName="F(t)",
-                     f=F _,
-                     //3.0 līdz 3.9
-                     range=(3.0 until 4.0 by 0.1))
+               "\\noindent\n"+
+               oneHundrethTable(parameterName="t",
+                                f=F _,
+                                range=(0 to 2))+"\n\n\\*\n\n"+
+               "\\noindent\n"+
+               hTable(parameterName="t",
+                      functionName="F(t)",
+                      f=F _,
+                      //3.0 līdz 3.9
+                      range=(3.0 until 4.0 by 0.1))
               )
   val header = """
-    |Normālā integrāļa funkcija 
+    |Normālā sadalījuma integrāļa funkcija 
     |(laukuma daļa zem līknes no $-\infty$ līdz $t$)
     |$\displaystyle F(t)={1\over\sqrt{2\pi}}\int\limits_{-\infty}^te^{-t^2\over2}dt$
+  """.stripMargin
+}
+
+object SimNormDistTable extends Generator {
+  import Alias.Phi
+  val defaultFileName = "simNormDist.tex"
+  def inner = (
+               header+"\n\n"+
+               "\\noindent\n"+
+               oneHundrethTable(parameterName="t",
+                               f=Phi _,
+                               range=(0 to 2))
+              )
+  val header = """
+    |Normālā sadalījuma integrālās funkcijas 
+    |(laukuma daļa zem līknes no $-t$ līdz $+t$)\\
+    |$\displaystyle \Phi(t)={1\over\sqrt{2\pi}}\int\limits_{-t}^{+t}e^{-t^2\over2}dt$
   """.stripMargin
 }
