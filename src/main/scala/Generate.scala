@@ -25,11 +25,41 @@ sealed trait Generator {
     pw.println(generate)
     pw.close
   }
+
+  def hTable(parameterName: String,
+             functionName: String,
+             f: Double=>Double,
+             range: Seq[Double]) = {
+    val header = "\\begin{table}{r |"+(" c" * range.size)+"}"
+    val argFormat = "%1.1f"
+    val args = range.map(argFormat.format(_)).mkString("&")
+    def formatValue(d: Double) = if(d<1) (d*1000).toInt.toString else "%1.4".format(d)
+    val values = ","+range.map(f).map(formatValue _).mkString("&")
+    val hline ="\\hline\n" 
+    val footer = "\\end{table}"
+    (
+     header+"\n"+
+     hline+
+     parameterName+"&"+args+"\\\\\n"+
+     hline+
+     functionName+"&"+values+"\\\\\n"+
+     hline+
+     footer
+    )
+  }
 }
 
 object NormDistTable extends Generator {
+  import Alias.F
   val defaultFileName = "normDist.tex"
-  def inner = header
+  def inner = (
+               header+"\n\n"+
+               "\\noindent\n"+
+               hTable(parameterName="t",
+                      functionName="F(t)",
+                      f=F _,
+                      range=(-3.0 to -3.9 by -0.1))
+              )
   val header = """
     |Normālā integrāļa funkcija 
     |(laukuma daļa zem līknes no $-\infty$ līdz $t$)
