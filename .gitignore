@@ -16,3 +16,9 @@ project/plugins/project/
 .scala_dependencies
 .worksheet
 *~
+
+# Generated LaTex
+*.tex
+*.pdf
+*.aux
+*.synctex.gz
